@@ -96,7 +96,7 @@
   </div>
 
   <!-- 通用输入弹窗（替代浏览器 prompt） -->
-  <div class="modal-mask" id="promptModal" style="display:none">
+  <div class="modal-mask" id="promptModal" style="display:none;z-index:70">
     <div class="modal-card" style="max-width:380px;text-align:left">
       <h3 id="promptTitle" style="margin:0 0 6px">提示</h3>
       <p id="promptMsg" style="margin:0 0 14px;color:var(--ink-soft);font-size:14px"></p>
@@ -109,7 +109,7 @@
   </div>
 
   <!-- 通用确认弹窗（替代浏览器 confirm） -->
-  <div class="modal-mask" id="confirmModal" style="display:none">
+  <div class="modal-mask" id="confirmModal" style="display:none;z-index:70">
     <div class="modal-card" style="max-width:360px;text-align:center">
       <p id="confirmMsg" style="margin:0 0 18px;font-size:15px;line-height:1.6"></p>
       <div style="display:flex;gap:10px;justify-content:center">
