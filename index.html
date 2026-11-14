@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Melody 的班级工作台 · 吉卜力可爱风</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- 漂浮云朵装饰 -->
+  <div class="sky-deco" aria-hidden="true">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="sun"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo">🐾</span>
+      <div class="brand-text">
+        <h1>Melody 的班级工作台</h1>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <label class="student-picker">
+        <span>当前</span>
+        <div class="dd-wrap" id="classDd">
+          <button class="dd-trigger" type="button" onclick="ddToggle(event)">
+            <span class="dd-label" id="ddLabel">—</span>
+            <span class="dd-arrow">▾</span>
+          </button>
+          <div class="dd-menu" id="ddMenu" style="display:none"></div>
+        </div>
+      </label>
+      <button class="create-stu-btn" onclick="openCreateStudent()">＋ 创建新学员</button>
+      <div class="cur-points" id="curPointsBadge">0 分</div>
+    </div>
+  </header>
+
+  <div class="app">
+    <nav class="sidebar">
+      <button class="nav-btn active" data-view="home" onclick="navigate('home')">
+        <span class="nav-ico">🏡</span><span>工作台</span>
+      </button>
+      <button class="nav-btn" data-view="points" onclick="navigate('points')">
+        <span class="nav-ico">⭐</span><span>积分管理</span>
+      </button>
+      <button class="nav-btn" data-view="students" onclick="navigate('students')">
+        <span class="nav-ico">👥</span><span>班级学员</span>
+      </button>
+      <button class="nav-btn" data-view="adopt" onclick="navigate('adopt')">
+        <span class="nav-ico">🥚</span><span>领养中心</span>
+      </button>
+      <button class="nav-btn" data-view="pets" onclick="navigate('pets')">
+        <span class="nav-ico">🌟</span><span>我的宠物</span>
+      </button>
+      <button class="nav-btn" data-view="shop" onclick="navigate('shop')">
+        <span class="nav-ico">🛍️</span><span>宠物商店</span>
+      </button>
+      <div class="sidebar-foot">
+        <button class="ghost-btn" onclick="openDataModal()">💾 备份 / 恢复</button>
+        <button class="ghost-btn" onclick="resetAll()">↺ 重置数据</button>
+      </div>
+    </nav>
+
+    <main class="content" id="content"></main>
+  </div>
+
+  <!-- 自创宠物弹窗 -->
+  <div class="modal-mask" id="customModal" style="display:none">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeCustom()">×</button>
+      <h2>✨ 创作独一无二的小宠物</h2>
+      <p class="modal-tip">消耗 <b>120 分</b> 即可自创一只专属宠物（颜色、物种由你定）</p>
+      <div class="modal-body">
+        <div class="modal-form">
+          <label>宠物名字
+            <input id="cName" type="text" maxlength="8" placeholder="例如：棉花糖" />
+          </label>
+          <label>选择物种
+            <select id="cSpecies"></select>
+          </label>
+          <div class="color-row">
+            <label>身体颜色<br><input id="cBody" type="color" value="#ffd6e0" /></label>
+            <label>点缀颜色<br><input id="cAccent" type="color" value="#fff3b0" /></label>
+          </div>
+          <div class="preview-box" id="cPreview"></div>
+          <button class="primary-btn" onclick="createCustomPet()">🎨 创作并领养</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通用输入弹窗（替代浏览器 prompt） -->
+  <div class="modal-mask" id="promptModal" style="display:none">
+    <div class="modal-card" style="max-width:380px;text-align:left">
+      <h3 id="promptTitle" style="margin:0 0 6px">提示</h3>
+      <p id="promptMsg" style="margin:0 0 14px;color:var(--ink-soft);font-size:14px"></p>
+      <input id="promptInput" type="text" style="display:block;width:100%;box-sizing:border-box;font-family:inherit;font-size:16px;padding:10px 14px;border-radius:12px;border:2px solid var(--brown);margin-bottom:16px;background:var(--cream)" onkeydown="if(event.key==='Enter')_okPrompt();if(event.key==='Escape')_closePrompt(null)" />
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="ghost-btn" style="display:inline-block;width:auto;padding:8px 20px" onclick="_closePrompt(null)">取消</button>
+        <button class="primary-btn" style="display:inline-block;width:auto;padding:8px 20px" onclick="_okPrompt()">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 通用确认弹窗（替代浏览器 confirm） -->
+  <div class="modal-mask" id="confirmModal" style="display:none">
+    <div class="modal-card" style="max-width:360px;text-align:center">
+      <p id="confirmMsg" style="margin:0 0 18px;font-size:15px;line-height:1.6"></p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button class="ghost-btn" style="display:inline-block;width:auto;padding:8px 20px" onclick="_closeConfirm(false)">取消</button>
+        <button class="primary-btn" style="display:inline-block;width:auto;padding:8px 20px" onclick="_closeConfirm(true)">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 创建新学员弹窗 -->
+  <div class="modal-mask" id="createStudentModal" style="display:none">
+    <div class="modal-card" style="max-width:440px;text-align:left">
+      <button class="modal-close" onclick="closeCreateStudent()">×</button>
+      <h2>➕ 创建新学员</h2>
+      <div class="cs-tabs">
+        <button class="cs-tab active" id="csTabInd" onclick="switchCreateTab('individual')">👤 个人学员</button>
+        <button class="cs-tab" id="csTabBat" onclick="switchCreateTab('batch')">👥 班级学员</button>
+      </div>
+      <!-- 个人学员 -->
+      <div class="cs-panel" id="csIndividual">
+        <p class="cs-tip">创建一位独立学员（不归属于任何班级）</p>
+        <label class="cs-field">学员姓名
+          <input id="indStuName" type="text" maxlength="8" placeholder="例如：小明" onkeydown="if(event.key==='Enter')createIndividualStudent()" />
+        </label>
+        <button class="primary-btn" style="width:100%;margin-top:14px" onclick="createIndividualStudent()">✅ 添加个人学员</button>
+      </div>
+      <!-- 班级学员 -->
+      <div class="cs-panel" id="csBatch" style="display:none">
+        <p class="cs-tip">批量添加学员，每行一个名字</p>
+        <label class="cs-field">选择班级
+          <select id="batchClassSelect"></select>
+        </label>
+        <label class="cs-field">或输入新班级名
+          <input id="batchNewClass" type="text" maxlength="12" placeholder="（可选）输入则新建班级" />
+        </label>
+        <label class="cs-field">学员名单（每行一个）
+          <textarea id="batchStuNames" rows="6" placeholder="小明&#10;小红&#10;小刚&#10;乐乐" style="font-family:inherit;font-size:14px;padding:10px;border-radius:12px;border:2px solid var(--brown);width:100%;box-sizing:border-box;background:var(--cream);resize:vertical"></textarea>
+        </label>
+        <button class="primary-btn" style="width:100%;margin-top:14px" onclick="createClassStudents()">✅ 批量添加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据备份 / 恢复弹窗 -->
+  <div class="modal-mask" id="dataModal" style="display:none">
+    <div class="modal-card" style="max-width:500px;text-align:left">
+      <button class="modal-close" onclick="closeDataModal()">×</button>
+      <h2>💾 备份与恢复</h2>
+      <p class="modal-tip" style="font-size:13px;color:var(--ink-soft);line-height:1.7">
+        打开时已自动填入当前数据。<br>
+        <b>备份</b>：点「📋 复制数据」，把文本存到备忘录 / 微信收藏。<br>
+        <b>恢复</b>：把之前备份的文本粘贴到下面，点「📥 导入数据」。<br>
+        <b>换新链接时</b>：在旧链接复制 → 在新链接导入，数据就搬过来啦～
+      </p>
+      <textarea id="dataArea" rows="8" placeholder="把备份的数据粘贴到这里…" style="width:100%;box-sizing:border-box;font-family:ui-monospace,Menlo,monospace;font-size:11px;line-height:1.5;padding:10px;border-radius:12px;border:2px solid var(--brown);background:var(--cream);resize:vertical"></textarea>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap">
+        <button class="ghost-btn" style="display:inline-block;width:auto;padding:8px 18px" onclick="fillCurrentData()">↺ 填入当前数据</button>
+        <button class="primary-btn" style="display:inline-block;width:auto;padding:8px 18px" onclick="copyDataArea()">📋 复制数据</button>
+        <button class="primary-btn" style="display:inline-block;width:auto;padding:8px 18px" onclick="importData()">📥 导入数据</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
